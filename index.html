@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>Boryka prices</title>
+    <script src="jquery-1.11.3.min.js"></script>
+    <script>
+        var doubleRoomId = 1;
+        var mansardRoomId = 2;
+        var apartmentRoomId = 3;
+
+        var rooms = [{
+            id: doubleRoomId,
+            name: "Двойна стая",
+            maxAdults: 2,
+            maxPeople: 3,
+            defaultAdults: 2,
+            defaultChildren: 0
+        }, {
+            id: mansardRoomId,
+            name: "Мансардна стая",
+            maxAdults: 2,
+            maxPeople: 3,
+            defaultAdults: 2,
+            defaultChildren: 0
+        }, {
+            id: apartmentRoomId,
+            name: "Апартамент",
+            maxAdults: 3,
+            maxPeople: 4,
+            defaultAdults: 2,
+            defaultChildren: 2
+        }];
+
+        var adultBreakfastPrice = 5;
+        var adultSpaPrice = 12;
+        var childrenBreakfastPrice = 3;
+        var childrenSpaPrice = 8;
+
+        function getRoom(roomId) {
+            var foundRooms = $.grep(rooms, function (e) { return e.id == roomId; });
+
+            if (foundRooms.length == 1) {
+                return foundRooms[0];
+            }
+            else {
+                return null;
+            }
+        }
+
+        function getPrice(roomId, adults, children, hasSpa, hasBreakfast, nightsCount) {
+            var room = getRoom(roomId);
+
+            if (room == null) { throw "Моля, изберете вид стая."; }
+            if (adults < 1) { throw "Моля, изберете поне 1 възрастен."; }
+            if (adults > room.maxAdults) { throw "Избрали сте невалиден брой възрастни."; }
+            if (adults + children > room.maxPeople) { throw "Избрали сте невалиден брой деца."; }
+
+            var result = {
+                price: 0,
+                discountPercent: 0,
+                discountPrice: 0
+            };
+
+            // ***** DOUBLE ROOM *****
+            if (roomId == doubleRoomId) {
+                switch (adults) {
+                    case 1:
+                        switch (children) {
+                            case 0:
+                                result.price = 28;
+                                break;
+                            case 1:
+                                result.price = 32;
+                                break;
+                            case 2:
+                                result.price = 36;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case 2:
+                        switch (children) {
+                            case 0:
+                                result.price = 40;
+                                break;
+                            case 1:
+                                result.price = 44;
+                                break;
+                                break;
+                        }
+                    default:
+                        break;
+                }
+            }
+
+            // ***** MANSARD ROOM *****
+            if (roomId == mansardRoomId) {
+                switch (adults) {
+                    case 1:
+                        switch (children) {
+                            case 0:
+                                result.price = 33;
+                                break;
+                            case 1:
+                                result.price = 37;
+                                break;
+                            case 2:
+                                result.price = 41;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case 2:
+                        switch (children) {
+                            case 0:
+                                result.price = 46;
+                                break;
+                            case 1:
+                                result.price = 50;
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            // ***** APARTMENT ROOM *****
+            if (roomId == apartmentRoomId) {
+                switch (adults) {
+                    case 1:
+                        switch (children) {
+                            case 0:
+                                result.price = 40;
+                                break;
+                            case 1:
+                                result.price = 44;
+                                break;
+                            case 2:
+                                result.price = 48;
+                                break;
+                            case 3:
+                                result.price = 52;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case 2:
+                        switch (children) {
+                            case 0:
+                                result.price = 56;
+                                break;
+                            case 1:
+                                result.price = 60;
+                                break;
+                            case 2:
+                                result.price = 64;
+                                break;
+                        }
+                        break;
+                    case 3:
+                        switch (children) {
+                            case 0:
+                                result.price = 65;
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (nightsCount > 2) {
+                result.discountPercent = nightsCount * 2 + 1;
+                result.discountPrice = ((1 - result.discountPercent / 100) * result.price).toFixed(2);
+            }
+
+            if (hasBreakfast) {
+                result.price += children * childrenBreakfastPrice;
+                result.price += adults * adultBreakfastPrice;
+
+                result.discountPrice += children * childrenBreakfastPrice;
+                result.discountPrice += adults * adultBreakfastPrice;
+            }
+
+            if (hasSpa) {
+                result.price += children * childrenSpaPrice;
+                result.price += adults * adultSpaPrice;
+
+                result.discountPrice += children * childrenSpaPrice;
+                result.discountPrice += adults * adultSpaPrice;
+            }
+
+            result.price *= nightsCount;
+            result.discountPrice *= nightsCount;
+
+            result.price = result.price.toFixed(2);
+            result.discountPrice = result.discountPrice.toFixed(2);
+
+            return result;
+        }
+
+        $(document).ready(function () {
+            $(".rooms-ddl").change(function () {
+                var roomsDdl = $(this);
+                var parentDiv = roomsDdl.parents(".room-price-wrapper");
+                var adultsDdl = parentDiv.find(".adults-ddl");
+                var childrenDdl = parentDiv.find(".children-ddl");
+
+                var room = getRoom(roomsDdl.val());
+
+                adultsDdl.find('option').remove().end();
+
+                for (var i = 1; i <= room.maxAdults; i++) {
+                    adultsDdl.append($("<option />").val(i).text(i));
+                }
+
+                adultsDdl.val(room.defaultAdults).change();
+
+                childrenDdl.val(room.defaultChildren).change();
+            });
+
+            $(".adults-ddl").change(function () {
+                var adultsDdl = $(this);
+                var parentDiv = adultsDdl.parents(".room-price-wrapper");
+                var roomsDdl = parentDiv.find(".rooms-ddl");
+                var childrenDdl = parentDiv.find(".children-ddl");
+
+                var room = getRoom(roomsDdl.val());
+
+                childrenDdl.find('option').remove().end();
+
+                // EXCEPTION FOR APARTMENTS
+                if (room.id == apartmentRoomId && adultsDdl.val() == room.maxAdults) {
+                    childrenDdl.append($("<option />").val(0).text(0));
+                }
+                else {
+                    for (var i = 0; i <= room.maxPeople - adultsDdl.val() ; i++) {
+                        childrenDdl.append($("<option />").val(i).text(i));
+                    }
+                }
+
+                childrenDdl.change();
+            });
+
+            $(".room-price-wrapper select, .room-price-wrapper input").change(function () {
+                var parentDiv = $(this).parents(".room-price-wrapper");
+
+                var roomsDdl = parentDiv.find(".rooms-ddl");
+                var adultsDdl = parentDiv.find(".adults-ddl");
+                var childrenDdl = parentDiv.find(".children-ddl");
+                var spaCbx = parentDiv.find(".spa-cbx");
+                var breakfastCbx = parentDiv.find(".breakfast-cbx");
+                var nightsDdl = parentDiv.find(".nights-ddl");
+
+                var priceSpan = parentDiv.find(".price-span");
+
+                var result = getPrice(parseInt(roomsDdl.val()), parseInt(adultsDdl.val()), parseInt(childrenDdl.val()), spaCbx.is(":checked"), breakfastCbx.is(":checked"), parseInt(nightsDdl.val()));
+
+                if (result.discountPercent > 0) {
+                    var discountedPrice = ((1 - result.discountPercent / 100) * result.price).toFixed(2);
+
+                    var htmlContent = '<del>' + result.price + ' лв.</del>';
+                    htmlContent += ' <span style="color:red;">' + discountedPrice + ' лв.*</span>';
+                    priceSpan.html(htmlContent);
+                }
+                else {
+                    priceSpan.html(result.price + " лв.")
+                }
+            });
+
+            var ddl = $(".rooms-ddl");
+            $.each(rooms, function (index, room) {
+                ddl.append($("<option />").val(room.id).text(room.name));
+            });
+            ddl.val(rooms[0].id).change();
+        });
+    </script>
+
+    <style>
+      .room-price-wrapper > table {
+          border-collapse: collapse;
+      }
+
+          .room-price-wrapper > table td {
+              border: 1px solid black;
+              padding: 5px;
+              vertical-align: bottom;
+          }
+
+              .room-price-wrapper > table td.text-right {
+                  text-align: right;
+              }
+
+              .room-price-wrapper > table span.price-span {
+                  font-weight: bold;
+                  font-size: 18px;
+              }
+    </style>
+</head>
+
+<body>
+    <div class="room-price-wrapper">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <label>Моля, изберете типа стая:</label>
+                    <select class="rooms-ddl"></select>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="text-right">
+                    <label>
+                        <img src="adult.PNG" />Брой възрастни:
+                    </label>
+                    <select class="adults-ddl"></select>
+                </td>
+                <td>
+                    <label>
+                        Вкл. закуска: <input type="checkbox" checked class="breakfast-cbx" />
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="text-right">
+                    <label>
+                        <img src="child.PNG" /> Брой деца (5-14г.):
+                    </label>
+                    <select class="children-ddl"></select>
+                </td>
+                <td>
+                    <label>
+                        Вкл. СПА: <input type="checkbox" checked class="spa-cbx" />
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <label>Брой нощувки:</label>
+                    <select class="nights-ddl">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <label>Стойност в лева:</label>
+                    <span class="price-span" />
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</body>
+</html>
