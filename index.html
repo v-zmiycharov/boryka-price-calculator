@@ -319,6 +319,12 @@
                   text-align: right;
               }
 
+              .room-price-wrapper > table td label.fixed-label {
+                  text-align: right;
+                  width: 132px;
+                  display: inline-block;
+              }
+
           .room-price-wrapper > table span.price-span {
               font-weight: bold;
               font-size: 18px;
@@ -353,7 +359,7 @@
 
             <tr>
                 <td class="text-right">
-                    <label>
+                    <label class="fixed-label">
                         Брой възрастни:
                     </label>
                     <select class="adults-ddl"></select>
@@ -368,7 +374,7 @@
 
             <tr>
                 <td class="text-right">
-                    <label>
+                    <label class="fixed-label">
                         Брой деца (5-14г.):
                     </label>
                     <select class="children-ddl"></select>
@@ -383,7 +389,7 @@
 
             <tr>
                 <td colspan="2">
-                    <label>Брой нощувки:</label>
+                    <label class="fixed-label">Брой нощувки:</label>
                     <select class="nights-ddl">
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -398,7 +404,7 @@
 
             <tr>
                 <td colspan="2">
-                    <label>Стойност в лева:</label>
+                    <label class="fixed-label">Стойност в лева:</label>
                     <span class="price-span" />
                 </td>
             </tr>
