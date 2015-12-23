@@ -39,6 +39,9 @@
         var childrenBreakfastPrice = 3;
         var childrenSpaPrice = 8;
 
+        var adultImage = '<img src="adult.PNG" />';
+        var childImage = '<img src="child.PNG" />';
+
         function getRoom(roomId) {
             var foundRooms = $.grep(rooms, function (e) { return e.id == roomId; });
 
@@ -241,12 +244,30 @@
                     childrenDdl.append($("<option />").val(0).text(0));
                 }
                 else {
-                    for (var i = 0; i <= room.maxPeople - adultsDdl.val() ; i++) {
+                    for (var i = 0; i <= room.maxPeople - parseInt(adultsDdl.val()) ; i++) {
                         childrenDdl.append($("<option />").val(i).text(i));
                     }
                 }
 
                 childrenDdl.change();
+
+                // set images
+                var imageDiv = $(this).parent().find(".adult-images");
+                imageDiv.html("");
+                for (var i = 0; i < parseInt(adultsDdl.val()) ; i++) {
+                    imageDiv.append(adultImage);
+                }
+            });
+
+            $(".children-ddl").change(function () {
+                var childrenDdl = $(this);
+
+                // set images
+                var imageDiv = $(this).parent().find(".child-images");
+                imageDiv.html("");
+                for (var i = 0; i < parseInt(childrenDdl.val()) ; i++) {
+                    imageDiv.append(childImage);
+                }
             });
 
             $(".room-price-wrapper select, .room-price-wrapper input").change(function () {
@@ -298,10 +319,25 @@
                   text-align: right;
               }
 
-              .room-price-wrapper > table span.price-span {
-                  font-weight: bold;
-                  font-size: 18px;
-              }
+          .room-price-wrapper > table span.price-span {
+              font-weight: bold;
+              font-size: 18px;
+          }
+
+      .child-images, .adult-images {
+          display: inline-block;
+          width: 60px;
+          text-align: left;
+          vertical-align: bottom;
+      }
+
+      .child-images {
+          height: 28px;
+      }
+
+      .adult-images {
+          height: 37px;
+      }
     </style>
 </head>
 
@@ -318,9 +354,10 @@
             <tr>
                 <td class="text-right">
                     <label>
-                        <img src="adult.PNG" />Брой възрастни:
+                        Брой възрастни:
                     </label>
                     <select class="adults-ddl"></select>
+                    <div class="adult-images"></div>
                 </td>
                 <td>
                     <label>
@@ -332,9 +369,10 @@
             <tr>
                 <td class="text-right">
                     <label>
-                        <img src="child.PNG" /> Брой деца (5-14г.):
+                        Брой деца (5-14г.):
                     </label>
                     <select class="children-ddl"></select>
+                    <div class="child-images"></div>
                 </td>
                 <td>
                     <label>
