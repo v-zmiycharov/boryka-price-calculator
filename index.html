@@ -270,7 +270,7 @@
                 }
             });
 
-            $(".room-price-wrapper select, .room-price-wrapper input").change(function () {
+            $(".room-price-wrapper select.children-ddl, .room-price-wrapper select.nights-ddl, .room-price-wrapper input").change(function () {
                 var parentDiv = $(this).parents(".room-price-wrapper");
 
                 var roomsDdl = parentDiv.find(".rooms-ddl");
