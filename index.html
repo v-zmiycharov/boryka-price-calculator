@@ -181,7 +181,7 @@
 
             if (nightsCount > 2) {
                 result.discountPercent = nightsCount * 2 + 1;
-                result.discountPrice = ((1 - result.discountPercent / 100) * result.price).toFixed(2);
+                result.discountPrice = (1 - result.discountPercent / 100) * result.price;
             }
 
             if (hasBreakfast) {
@@ -285,10 +285,8 @@
                 var result = getPrice(parseInt(roomsDdl.val()), parseInt(adultsDdl.val()), parseInt(childrenDdl.val()), spaCbx.is(":checked"), breakfastCbx.is(":checked"), parseInt(nightsDdl.val()));
 
                 if (result.discountPercent > 0) {
-                    var discountedPrice = ((1 - result.discountPercent / 100) * result.price).toFixed(2);
-
                     var htmlContent = '<del>' + result.price + ' лв.</del>';
-                    htmlContent += ' <span style="color:red;">' + discountedPrice + ' лв.*</span>';
+                    htmlContent += ' <span style="color:red;">' + result.discountPrice + ' лв.*</span>';
                     priceSpan.html(htmlContent);
                 }
                 else {
